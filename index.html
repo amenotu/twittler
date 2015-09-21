@@ -10,16 +10,56 @@
       $(document).ready(function(){
         var $body = $('body');
         $body.html('');
+        
+        var index = 0;
+        var length = streams.home.length;
 
-        var index = streams.home.length - 1;
-        while(index >= 0){
+        function timeStamp (){
+          var start = new Date();
+          var monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+          var day = start.getDate();
+          var month = start.getMonth();
+          var year = start.getFullYear();
+          var hours = start.getHours();
+          var hourAM = start.getHours();
+          var hourPM = start.getHours() - 12;
+          var minutes = start.getMinutes();
+
+          if(hours <= 12){
+            if(hours === 0){
+              return (monthNames[month] + " " + day + ", " + year + " at " + 12 + ":" + minutes + "AM");
+            } else {
+              return (monthNames[month] + " " + day + ", " + year + " at " + hourAM + ":" + minutes + "AM");
+            }
+          } else {
+            return (monthNames[month] + " " + day + ", " + year + " at " + hourPM + ":" + minutes + "PM");
+          }
+        };
+
+        function showTweet(){
           var tweet = streams.home[index];
-          var $tweet = $('<div></div>');
-          $tweet.text('@' + tweet.user + ': ' + tweet.message);
+          var $tweet = $('<div id="tweet"></div>');
+          $tweet.text('@' + tweet.user + ': ' + tweet.message + " " + timeStamp());
           $tweet.appendTo($body);
-          index -= 1;
-        }
+          index += 1;
+        };
 
+        showTweet();
+
+        var newTweets = setInterval(function(){
+          if(index < 20){
+            return showTweet();
+          } else {
+            clearInterval(newTweets);
+          }
+        }, ((Math.random() * 6) * 10000));
+
+
+        
+
+
+
+    
       });
 
     </script>
