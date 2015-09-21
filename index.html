@@ -24,15 +24,30 @@
           var hourAM = start.getHours();
           var hourPM = start.getHours() - 12;
           var minutes = start.getMinutes();
+          var seconds = start.getSeconds();
+          var sec;
+          var min;
+
+          if(seconds < 10){
+            seconds = "0" + seconds;
+          } else {
+            seconds = seconds;
+          }
+
+          if(minutes < 10){
+            minutes = "0" + minutes;
+          } else {
+            minutes = minutes;
+          }
 
           if(hours <= 12){
             if(hours === 0){
-              return (monthNames[month] + " " + day + ", " + year + " at " + 12 + ":" + minutes + "AM");
+              return (monthNames[month] + " " + day + ", " + year + " at " + 12 + ":" + minutes + ":" + seconds + "AM");
             } else {
-              return (monthNames[month] + " " + day + ", " + year + " at " + hourAM + ":" + minutes + "AM");
+              return (monthNames[month] + " " + day + ", " + year + " at " + hourAM + ":" + minutes + ":" + seconds + "AM");
             }
           } else {
-            return (monthNames[month] + " " + day + ", " + year + " at " + hourPM + ":" + minutes + "PM");
+            return (monthNames[month] + " " + day + ", " + year + " at " + hourPM + ":" + minutes + ":" + seconds + "PM");
           }
         };
 
