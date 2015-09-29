@@ -3,6 +3,7 @@
   <head>
     <script src="jquery.js"></script>
     <script src="data_generator.js"></script>
+    <link rel="stylesheet" href="main.css">
   </head>
   <body>
     <script>
@@ -10,21 +11,82 @@
       $(document).ready(function(){
         var $body = $('body');
         $body.html('');
-        
-        var index = 0;
-        var length = streams.home.length;
 
-        function timeStamp (){
-          var start = new Date();
+        //LAYOUT
+        var $header = $('<h1 class="header container group">TWITTLER</h1>');
+        $header.appendTo($body);
+
+        var $pgContainer = $('<div class="grid"></div>');
+        $pgContainer.appendTo($body);
+
+        var $footer = $('<footer class="footer container group"></footer>');
+        $footer.appendTo($body);
+
+        var $sidebar = $('<aside class="sidebar"></aside>');
+        $sidebar.appendTo($pgContainer);
+
+        var $main = $('<div class="main"></div>');
+        $main.appendTo($pgContainer);
+
+        var $nav = $('<div class="nav"></div>');
+        $nav.appendTo($sidebar);
+
+        var $sidebarHdr = $('<h3>Following</h3>');
+        $sidebarHdr.appendTo($nav);
+
+        var $users = $('<ul class="users"></ul>');
+        $users.appendTo($nav);
+
+        var $userLink1 = $('<li><a id="shawndrost" href="#shawn">@shawndrost</a></li>');
+        $userLink1.appendTo($users);
+
+        var $userLink2 = $('<li><a id="sharksforcheap" href="#sharks">@sharksforcheap</a></li>');
+        $userLink2.appendTo($users);
+
+        var $userLink3 = $('<li><a id="racus" href="#mracus">@mracus</a></li>');
+        $userLink3.appendTo($users);
+
+        var $userLink4 = $('<li><a id="douglascalhoun" href="#doug">@douglascalhoun</a></li>');
+        $userLink4.appendTo($users);
+
+        var $hometab = $('<li><a id="hometab" href="#home">Home</a></li>');
+        $hometab.appendTo($users);
+
+        var $mainHdr = $('<h3 class="mainHdr"><strong>Twitts</strong></h3>');
+        $mainHdr.appendTo($main);
+
+        var $refresh = $('<a id="refresh" href="#">Refresh</a>');
+        $refresh.appendTo($mainHdr);
+
+        var $home = $('<div id="home"></div>');
+        $home.appendTo($main);
+
+        var $shawn = $('<div id="shawn"></div>');
+        $shawn.appendTo($main);
+
+        var $sharks = $('<div id="sharks"></div>');
+        $sharks.appendTo($main);
+
+        var $mracus = $('<div id="mracus"></div>');
+        $mracus.appendTo($main);
+
+        var $doug = $('<div id="doug"></div>');
+        $doug.appendTo($main);
+
+
+        //FUNCTIONs
+        var previousLength = (streams.home.length-1).toString();
+
+        var timeStamp = function(date) {
           var monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-          var day = start.getDate();
-          var month = start.getMonth();
-          var year = start.getFullYear();
-          var hours = start.getHours();
-          var hourAM = start.getHours();
-          var hourPM = start.getHours() - 12;
-          var minutes = start.getMinutes();
-          var seconds = start.getSeconds();
+          var day = date.getDate();
+          var month = date.getMonth();
+          var year = date.getFullYear();
+          var hours = date.getHours();
+          var hourAM = date.getHours();
+          var hourPM = date.getHours() - 12;
+          var minutes = date.getMinutes();
+          var seconds = date.getSeconds();
           var sec;
           var min;
 
@@ -51,27 +113,115 @@
           }
         };
 
-        function showTweet(){
-          var tweet = streams.home[index];
-          var $tweet = $('<div id="tweet"></div>');
-          $tweet.text('@' + tweet.user + ': ' + tweet.message + " " + timeStamp());
-          $tweet.appendTo($body);
-          index += 1;
+        //posts and displays twits
+        var displayContents = function(content) {
+          if(content === "home"){
+            var index = streams[content].length - 1;
+          } else if(streams.users.hasOwnProperty(content)){
+            var index = streams.users[content].length - 1;
+          }
+
+          for(var i = 0; i < index; i++){
+            if(content === "home"){
+              var tweet = streams[content][i];
+            } else {
+              var tweet = streams.users[content][i];
+            }
+            var time = tweet.created_at;
+            var stamp = timeStamp(time);
+            var $tweet = $('<div class="tweet"></div>');
+            var $name = $('<span class="name"></span>');
+            var $handle = $('<span class="handle"></span>');
+            var $msg = $('<div class="message"></div>');
+            var $timestamp = $('<span class="time"></span>');
+            $name.text(tweet.user);
+            $handle.text(" @" + tweet.user);
+            $msg.text(tweet.message);
+            $timestamp.text(stamp);
+            $name.appendTo($tweet);
+            $handle.appendTo($tweet);
+            $msg.appendTo($tweet);
+            $timestamp.appendTo($tweet);
+
+            if(content === "home"){
+              $tweet.appendTo($home);
+            } else if(content === "shawndrost") {
+              $tweet.prependTo($shawn);
+            } else if(content === "sharksforcheap") {
+              $tweet.prependTo($sharks);
+            } else if(content === "douglascalhoun") {
+              $tweet.prependTo($doug);
+            } else if(content === "mracus") {
+              $tweet.prependTo($mracus);
+            }
+          }
         };
 
-        showTweet();
+          displayContents("home");
 
-        var newTweets = setInterval(function(){
-          if(index < 20){
-            return showTweet();
-          } else {
-            clearInterval(newTweets);
-          }
-        }, ((Math.random() * 6) * 10000));
+          var refresh = function(){
+            console.log(previousLength);
+            var currentLength = streams.home.length;
+            if(parseInt(previousLength) < currentLength){//if previous length is less than current length, make a tweet
+              for(var k = parseInt(previousLength); k < currentLength; k++){//starts looping at the previous length's index
+                var tweet = streams.home[k];
+                var time = tweet.created_at;
+                var stamp = timeStamp(time);
+                var $tweet = $('<div class="tweet"></div>');
+                var $name = $('<span class="name"></span>');
+                var $handle = $('<span class="handle"></span>');
+                var $msg = $('<div class="message"></div>');
+                var $timestamp = $('<span class="time"></span>');
+                $name.text(tweet.user);
+                $handle.text(" @" + tweet.user);
+                $msg.text(tweet.message);
+                $timestamp.text(stamp);
+                $name.appendTo($tweet);
+                $handle.appendTo($tweet);
+                $msg.appendTo($tweet);
+                $timestamp.appendTo($tweet);
+                $tweet.prependTo($home);
+                previousLength = currentLength.toString();
+                console.log("after", streams.home.length, previousLength, typeof previousLength);
+              }
+            }
+          };
 
+          $('#refresh').click(function(){
+            refresh();
+          });
 
-        
+          $('#shawndrost').click(function(){
+            $('#shawn').empty();
+            displayContents("shawndrost");
+          });
 
+          $('#sharksforcheap').click(function(){
+            $('#sharks').empty();
+            displayContents("sharksforcheap");
+          });
+
+          $('#racus').click(function(){
+            $('#mracus').empty();
+            displayContents("mracus");
+          });
+
+          $('#douglascalhoun').click(function(){
+            $('#doug').empty();
+            displayContents("douglascalhoun");
+          });
+
+          var tabs = $('ul.users li a');
+
+          tabs.bind('click', function(event){
+            var $anchor = $(this);
+            var ids = tabs.each(function(){
+              $($(this).attr('href')).hide();
+            });
+
+            $($anchor.attr('href')).show();
+            event.preventDefault();
+          });
 
 
     
